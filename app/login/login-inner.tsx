@@ -49,7 +49,14 @@ export default function LoginInner() {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || "Login failed");
 
+            // Set session data
+            const now = Date.now().toString();
             sessionStorage.setItem("adminToken", data.token);
+            sessionStorage.setItem("sessionStartTime", now);
+            sessionStorage.setItem("lastActivity", now);
+            if (data.email) sessionStorage.setItem("adminEmail", data.email);
+            if (data.name) sessionStorage.setItem("adminName", data.name);
+            
             document.cookie = `adminToken=${data.token}; path=/; SameSite=Strict`;
 
             router.push("/dashboard");
