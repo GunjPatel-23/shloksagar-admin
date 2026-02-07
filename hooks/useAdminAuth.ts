@@ -52,7 +52,8 @@ export function useAdminAuth() {
         updateActivity()
 
         // Verify token with backend
-        fetch('http://localhost:3000/api/v1/admin/auth/verify', {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1'
+        fetch(`${apiUrl}/admin/auth/verify`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -64,9 +65,10 @@ export function useAdminAuth() {
             } else {
                 updateActivity()
             }
-        }).catch(() => {
-            clearAdminSession()
-            router.push('/login')
+        }).catch((error) => {
+            // Don't redirect on network errors - allow offline work
+            console.warn('Token verification failed:', error)
+            updateActivity()
         })
 
         // Set up activity listeners to update last activity time
